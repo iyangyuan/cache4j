@@ -80,6 +80,25 @@ public class BaseTest {
             throw new Exception("队列淘汰");
         }
         
+        tqc.put("e", "ev");
+        tqc.put("g", "gv");
+        
+        if(tqc.get("f") != null){
+            throw new Exception("队列淘汰");
+        }
+        
+        tqc.put("b", "bv");
+        
+        if(tqc.get("e") != null){
+            throw new Exception("队列淘汰");
+        }
+        
+        tqc.put("h", "hv");
+        
+        if(tqc.get("g") != null || tqc.get("h") == null || tqc.get("b") == null){
+            throw new Exception("队列淘汰");
+        }
+        
         System.out.println("all test passed");
     }
     
