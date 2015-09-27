@@ -106,8 +106,15 @@ public class TwoQueuesCache<K, V> implements ICache<K, V>{
 
     @Override
     public double hitRatio() {
-        // TODO Auto-generated method stub
-        return 0;
+        double _hitCount = this.fifoCache.getHitCount().doubleValue() + this.lruCache.getHitCount().doubleValue();
+        double _missCount = this.fifoCache.getMissCount().doubleValue() + this.lruCache.getMissCount().doubleValue();
+        double dividend = _hitCount + _missCount;
+        
+        if(dividend == 0){
+            return 0.0d;
+        }
+        
+        return _hitCount / dividend;
     }
 
     @Override

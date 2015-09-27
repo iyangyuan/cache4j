@@ -1,5 +1,7 @@
 package org.yangyuan.cache.core.impl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.yangyuan.cache.core.ICache;
 import org.yangyuan.cache.factory.INodeFactory;
 import org.yangyuan.cache.linked.impl.CacheLinked;
@@ -26,6 +28,16 @@ public class FifoCache<K, V> implements ICache<K, V>{
      * 配置
      */
     private CacheConfig config = null;
+    
+    /**
+     * 未命中计数
+     */
+    private AtomicInteger missCount = new AtomicInteger();
+    
+    /**
+     * 命中计数
+     */
+    private AtomicInteger hitCount = new AtomicInteger();
     
     /**
      * 构造方法
@@ -62,21 +74,32 @@ public class FifoCache<K, V> implements ICache<K, V>{
         
         NodeAbstract<K, V> node = linked.get(key);
         if(node != null){
+            this.hitCount.incrementAndGet();
             return node.getValue();
         }
         
+        this.missCount.incrementAndGet();
         return null;
     }
 
     @Override
     public double hitRatio() {
-        // TODO Auto-generated method stub
-        return 0;
+        double _hitCount = this.hitCount.doubleValue();
+        double _missCount = this.missCount.doubleValue();
+        double dividend = _hitCount + _missCount;
+        
+        if(dividend == 0){
+            return 0.0d;
+        }
+        
+        return _hitCount / dividend;
     }
 
     @Override
     public void clear() {
         this.linked = new CacheLinked<K, V>();
+        this.hitCount.set(0);
+        this.missCount.set(0);
     }
 
     @Override
@@ -95,6 +118,15 @@ public class FifoCache<K, V> implements ICache<K, V>{
             linked.remove(key);
         }
     }
+
+    public AtomicInteger getMissCount() {
+        return missCount;
+    }
+
+    public AtomicInteger getHitCount() {
+        return hitCount;
+    }
+
     
     
     
